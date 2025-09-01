@@ -1,14 +1,16 @@
 import mongoose from 'mongoose';
 
-const OrderSchema = new mongoose.Schema({
-  user: {
-    id: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
+const OrderSchema = new mongoose.Schema(
+  {
+    user: {
+      id: {
+        type: String,
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
     },
     products: [
       {
@@ -42,8 +44,10 @@ const OrderSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    timestamps: true,
   },
-});
+  {
+    timestamps: true, // ✅ Aqui é o lugar certo
+  }
+);
 
 export default mongoose.model('Order', OrderSchema);
