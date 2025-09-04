@@ -7,8 +7,12 @@ class UserController {
     // Definindo o schema de validação
     const schema = Yup.object({
       name: Yup.string().required('O nome é obrigatório'),
-      email: Yup.string().email('Email inválido').required('O email é obrigatório'),
-      password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('A senha é obrigatória'),
+      email: Yup.string()
+        .email('Email inválido')
+        .required('O email é obrigatório'),
+      password: Yup.string()
+        .min(6, 'A senha deve ter pelo menos 6 caracteres')
+        .required('A senha é obrigatória'),
       admin: Yup.boolean(),
     });
 
