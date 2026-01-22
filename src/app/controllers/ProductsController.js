@@ -49,7 +49,10 @@ class ProductController {
     }
   }
 
-  async updade(req, res) {
+  /* ===============================
+     UPDATE — imagem OPCIONAL
+  =============================== */
+  async update(req, res) {
     const schema = Yup.object({
       name: Yup.string(),
       price: Yup.number(),
@@ -60,48 +63,37 @@ class ProductController {
     try {
       await schema.validate(req.body, { abortEarly: false });
 
-      if (!req.file) {
-        return res
-          .status(400)
-          .json({ error: 'É necessário enviar um arquivo.' });
-      }
+      const { admin } = await User.findByPk(req.userId);
 
-      const { admin: isAdimin } = await User.findByPk(req.userId);
-
-      if (!isAdimin) {
+      if (!admin) {
         return res.status(401).json();
       }
 
       const { id } = req.params;
-      const findProducts = await Product.findByPk(id);
 
-      if (!findProducts) {
-        return res.status(400).json({ error: 'id do produto nao existe' });
-      }
+      const product = await Product.findByPk(id);
 
-      let path;
-      if (req.file) {
-        path = req.file.filename;
+      if (!product) {
+        return res.status(400).json({ error: 'Produto não encontrado.' });
       }
 
       const { name, price, category_id, offer } = req.body;
 
-      await Product.update(
-        {
-          name,
-          price,
-          category_id,
-          path,
-          offer,
-        },
-        {
-          where: {
-            id,
-          },
-        }
-      );
+      const updateData = {
+        name,
+        price,
+        category_id,
+        offer,
+      };
 
-      return res.status(201).json();
+      // imagem só atualiza se vier arquivo novo
+      if (req.file) {
+        updateData.path = req.file.filename;
+      }
+
+      await product.update(updateData);
+
+      return res.status(200).json();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         return res.status(400).json({ error: err.errors });
