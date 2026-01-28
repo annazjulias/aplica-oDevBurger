@@ -6,10 +6,14 @@ class Category extends Model {
       {
         name: Sequelize.STRING,
         path: Sequelize.STRING,
+
         url: {
           type: Sequelize.VIRTUAL,
           get() {
-            return `http://localhost:3002/category-file/${this.path}`;
+            const baseUrl =
+              process.env.API_URL || 'http://localhost:3002';
+
+            return `${baseUrl}/category-file/${this.path}`;
           },
         },
       },
@@ -17,6 +21,7 @@ class Category extends Model {
         sequelize,
       }
     );
+
     return this;
   }
 }
