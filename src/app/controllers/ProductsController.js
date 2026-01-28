@@ -4,6 +4,9 @@ import Category from '../models/Category.js';
 import User from '../models/User.js';
 
 class ProductController {
+  /* ===============================
+     CREATE
+  =============================== */
   async store(req, res) {
     const schema = Yup.object({
       name: Yup.string().required(),
@@ -21,25 +24,25 @@ class ProductController {
           .json({ error: 'É necessário enviar um arquivo.' });
       }
 
-      const { admin: isAdmin } = await User.findByPk(req.userId);
+      const user = await User.findByPk(req.userId);
 
-      if (!isAdmin) {
+      if (!user || !user.admin) {
         return res.status(401).json({ error: 'Não autorizado.' });
       }
 
       const { name, price, category_id, offer } = req.body;
 
-      // 👉 Cloudinary
+      // Cloudinary
       const imageUrl = req.file.path;       // URL pública
-      const publicId = req.file.filename;   // id do Cloudinary
+      const publicId = req.file.filename;   // ID Cloudinary
 
       const product = await Product.create({
         name,
         price,
         category_id,
+        offer,
         path: imageUrl,
         public_id: publicId,
-        offer,
       });
 
       return res.status(201).json(product);
@@ -48,13 +51,13 @@ class ProductController {
         return res.status(400).json({ error: err.errors });
       }
 
-      console.error(err);
+      console.error('Erro ao criar produto:', err);
       return res.status(500).json({ error: 'Erro interno do servidor.' });
     }
   }
 
   /* ===============================
-     UPDATE — imagem OPCIONAL
+     UPDATE (imagem opcional)
   =============================== */
   async update(req, res) {
     const schema = Yup.object({
@@ -67,9 +70,9 @@ class ProductController {
     try {
       await schema.validate(req.body, { abortEarly: false });
 
-      const { admin } = await User.findByPk(req.userId);
+      const user = await User.findByPk(req.userId);
 
-      if (!admin) {
+      if (!user || !user.admin) {
         return res.status(401).json({ error: 'Não autorizado.' });
       }
 
@@ -81,16 +84,11 @@ class ProductController {
         return res.status(400).json({ error: 'Produto não encontrado.' });
       }
 
-      const { name, price, category_id, offer } = req.body;
-
       const updateData = {
-        name,
-        price,
-        category_id,
-        offer,
+        ...req.body,
       };
 
-      // 👉 Atualiza imagem SOMENTE se vier nova
+      // Atualiza imagem somente se vier nova
       if (req.file) {
         updateData.path = req.file.path;
         updateData.public_id = req.file.filename;
@@ -104,23 +102,33 @@ class ProductController {
         return res.status(400).json({ error: err.errors });
       }
 
-      console.error(err);
+      console.error('Erro ao atualizar produto:', err);
       return res.status(500).json({ error: 'Erro interno do servidor.' });
     }
   }
 
+  /* ===============================
+     INDEX
+  =============================== */
   async index(req, res) {
-    const products = await Product.findAll({
-      include: [
-        {
-          model: Category,
-          as: 'category',
-          attributes: ['id', 'name'],
-        },
-      ],
-    });
+    try {
+      const products = await Product.findAll({
+        include: [
+          {
+            model: Category,
+            as: 'category',
+            attributes: ['id', 'name'],
+          },
+        ],
+      });
 
-    return res.json(products);
+      return res.status(200).json(products);
+    } catch (err) {
+      console.error('Erro ao listar produtos:', err);
+      return res.status(500).json({
+        error: 'Erro ao buscar produtos.',
+      });
+    }
   }
 }
 
