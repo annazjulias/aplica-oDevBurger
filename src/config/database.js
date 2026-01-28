@@ -1,11 +1,16 @@
 module.exports = {
   dialect: 'postgres',
-  host: 'localhost', // host do container mapeado
-  port: 5432,
-  username: 'postgres',
-  password: 'postgres', // senha que você definiu no container
-  database: 'devburger', // nome do banco
-
+  host: process.env.PGHOST || 'localhost',
+  port: process.env.PGPORT || 5432,
+  username: process.env.PGUSER || 'anajulia',
+  password: process.env.PGPASSWORD || 'postgres',
+  database: process.env.PGDATABASE || 'devburguer',
+  dialectOptions: {
+    ssl: process.env.NODE_ENV === 'production' ? {
+      require: true,
+      rejectUnauthorized: false
+    } : false
+  },
   define: {
     timestamps: true,
     underscored: true,

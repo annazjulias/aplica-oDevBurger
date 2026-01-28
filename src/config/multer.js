@@ -1,11 +1,13 @@
 import multer from 'multer';
-import { extname, resolve } from 'node:path';
-import { v4 } from 'uuid';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from './cloudinary.js';
 
-export default {
-  storage: multer.diskStorage({
-    destination: resolve(__dirname, '..', '..', 'uploades'),
-    filename: (req, file, callback) =>
-      callback(null, v4() + extname(file.originalname)),
-  }),
-};
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'uploads',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+  },
+});
+
+export default multer({ storage });

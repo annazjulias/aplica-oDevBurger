@@ -6,21 +6,18 @@ class Product extends Model {
       {
         name: Sequelize.STRING,
         price: Sequelize.INTEGER,
-        path: Sequelize.STRING,
+        path: Sequelize.STRING,       // URL da imagem (Cloudinary)
+        public_id: Sequelize.STRING,  // ID do Cloudinary (importante!)
         offer: Sequelize.BOOLEAN,
-        url: {
-          type: Sequelize.VIRTUAL,
-          get() {
-            return `http://localhost:3002/products-file/${this.path}`;
-          },
-        },
       },
       {
         sequelize,
       }
     );
+
     return this;
   }
+
   static associate(models) {
     this.belongsTo(models.Category, {
       foreignKey: 'category_id',

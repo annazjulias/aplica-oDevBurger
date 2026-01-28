@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
-import Product from '../models/Products';
-import Category from '../models/Category';
-import User from '../models/User';
+import Product from '../models/Products.js';
+import Category from '../models/Category.js';
+import User from '../models/User.js';
 
 class ProductController {
   async store(req, res) {
@@ -21,24 +21,28 @@ class ProductController {
           .json({ error: 'É necessário enviar um arquivo.' });
       }
 
-      const { admin: isAdimin } = await User.findByPk(req.userId);
+      const { admin: isAdmin } = await User.findByPk(req.userId);
 
-      if (!isAdimin) {
-        return res.status(401).json();
+      if (!isAdmin) {
+        return res.status(401).json({ error: 'Não autorizado.' });
       }
 
-      const { filename: path } = req.file;
       const { name, price, category_id, offer } = req.body;
+
+      // 👉 Cloudinary
+      const imageUrl = req.file.path;       // URL pública
+      const publicId = req.file.filename;   // id do Cloudinary
 
       const product = await Product.create({
         name,
         price,
         category_id,
-        path,
+        path: imageUrl,
+        public_id: publicId,
         offer,
       });
 
-      return res.status(201).json({ product });
+      return res.status(201).json(product);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         return res.status(400).json({ error: err.errors });
@@ -66,7 +70,7 @@ class ProductController {
       const { admin } = await User.findByPk(req.userId);
 
       if (!admin) {
-        return res.status(401).json();
+        return res.status(401).json({ error: 'Não autorizado.' });
       }
 
       const { id } = req.params;
@@ -86,14 +90,15 @@ class ProductController {
         offer,
       };
 
-      // imagem só atualiza se vier arquivo novo
+      // 👉 Atualiza imagem SOMENTE se vier nova
       if (req.file) {
-        updateData.path = req.file.filename;
+        updateData.path = req.file.path;
+        updateData.public_id = req.file.filename;
       }
 
       await product.update(updateData);
 
-      return res.status(200).json();
+      return res.status(200).json(product);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         return res.status(400).json({ error: err.errors });

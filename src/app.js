@@ -7,7 +7,10 @@ import cors from 'cors'
 class App {
   constructor() {
     this.app = express();
-    this.app.use(cors())
+    this.app.use(cors({
+      origin: process.env.FRONTEND_URL || '*',
+      credentials: true
+    }))
     this.middlewares();
     this.routes();
   }
