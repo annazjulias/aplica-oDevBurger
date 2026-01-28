@@ -14,10 +14,20 @@ class App {
   }
 
   middlewares() {
-    // ✅ CORS correto para JWT (sem credentials)
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://devburguerinterface.onrender.com',
+    ];
+
     this.app.use(
       cors({
-        origin: process.env.FRONTEND_URL || '*',
+        origin: (origin, callback) => {
+          if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
       })
