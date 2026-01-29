@@ -11,7 +11,7 @@ class Category extends Model {
           type: Sequelize.VIRTUAL,
           get() {
             const baseUrl =
-              process.env.API_URL || 'http://localhost:3002';
+              process.env.API_URL;
 
             return `${baseUrl}/category-file/${this.path}`;
           },
