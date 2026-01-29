@@ -5,15 +5,12 @@ class Category extends Model {
     super.init(
       {
         name: Sequelize.STRING,
-        path: Sequelize.STRING,
-
+        path: Sequelize.STRING, // URL da imagem no Cloudinary
         url: {
           type: Sequelize.VIRTUAL,
           get() {
-            const baseUrl =
-              process.env.API_URL;
-
-            return `${baseUrl}/category-file/${this.path}`;
+            // Retorna diretamente a URL do Cloudinary
+            return this.path;
           },
         },
       },

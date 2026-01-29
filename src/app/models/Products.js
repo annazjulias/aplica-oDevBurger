@@ -9,6 +9,13 @@ class Product extends Model {
         path: Sequelize.STRING,       // URL da imagem (Cloudinary)
         public_id: Sequelize.STRING,  // ID do Cloudinary (importante!)
         offer: Sequelize.BOOLEAN,
+        url: {
+          type: Sequelize.VIRTUAL,
+          get() {
+            // Retorna diretamente a URL do Cloudinary
+            return this.path;
+          },
+        },
       },
       {
         sequelize,

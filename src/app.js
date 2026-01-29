@@ -1,14 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import { resolve } from 'node:path';
-
 import routes from './routes.js';
 import './database';
 
 class App {
   constructor() {
     this.app = express();
-
     this.middlewares();
     this.routes();
   }
@@ -34,17 +31,6 @@ class App {
     );
 
     this.app.use(express.json());
-
-    // arquivos estáticos
-    this.app.use(
-      '/products-file',
-      express.static(resolve(process.cwd(), 'uploades'))
-    );
-
-    this.app.use(
-      '/category-file',
-      express.static(resolve(process.cwd(), 'uploades'))
-    );
   }
 
   routes() {
