@@ -1,3 +1,4 @@
+require('dotenv').config() // deve ser a primeira linha
 import express from 'express';
 import cors from 'cors';
 import routes from './routes.js';

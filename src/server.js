@@ -1,3 +1,4 @@
+require('dotenv').config() // deve ser a primeira linha
 import app from './app.js';
 import 'dotenv/config';
 
